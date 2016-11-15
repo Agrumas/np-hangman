@@ -12,5 +12,5 @@ import java.io.Serializable;
  * @author Algirdas
  */
 public enum ServerCommands implements Serializable {
-    Login, Quit
+    Login, Quit, StartGame
 }

@@ -6,6 +6,7 @@
 package hangman.common;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 /**
  *
@@ -15,6 +16,7 @@ public class Result implements Serializable {
     public String type;
     public String data;
     public boolean error;
+    public UUID inReply;
 
     public Result(String type) {
         this(type, "", false);
@@ -42,7 +44,12 @@ public class Result implements Serializable {
     public boolean isError() {
         return error;
     }
-    
+
+    public Result setInReply(UUID inReply) {
+        this.inReply = inReply;
+        return this;
+    }
+       
 
     @Override
     public String toString() {

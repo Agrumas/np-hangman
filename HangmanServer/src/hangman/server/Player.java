@@ -16,7 +16,7 @@ public class Player {
     public String word;
     public String guessWord;
     public int guessesLeft = 0;
-    public char[] guesses;
+    public String guesses;
 
     public Player(String name) {
         this.name = name;
@@ -26,7 +26,7 @@ public class Player {
         this.word = word;
         guessesLeft = word.length();
         guessWord = word.replace(".*", "-");
-        guesses = new char[guessesLeft];
+        guesses = "";
         return guessWord;
     }
 

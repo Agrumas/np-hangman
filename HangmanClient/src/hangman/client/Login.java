@@ -22,6 +22,7 @@ import javafx.stage.Stage;
 import javafx.util.converter.IntegerStringConverter;
 
 import hangman.common.Result;
+import hangman.common.ServerCommands;
 
 /**
  *
@@ -38,8 +39,9 @@ public class Login {
 
     public Login(LoginResponse loginCb) {
         Button btn = new Button();
-        btn.setText("Join Game");
-        
+        btn.setText("Connect");
+        Button start = new Button();
+        start.setText("Start Game");
 
         Label serverIpLabel = new Label("Server:");
         serverIpLabel.setFont(new Font("", 20));
@@ -48,7 +50,7 @@ public class Login {
         HBox serverIpGroup = new HBox();
         TextField serverPortField = new TextField();
         serverPortField.setTextFormatter(new TextFormatter<>(new IntegerStringConverter()));
-        serverPortField.setText("5050");
+        serverPortField.setText("4444");
         serverPortField.setMaxWidth(50);
         serverIpGroup.getChildren().addAll(serverIpLabel, serverIpField, serverPortField);
         serverIpGroup.setSpacing(10);
@@ -56,24 +58,28 @@ public class Login {
         Label usernameLabel = new Label("Username:");
         usernameLabel.setFont(new Font("", 20));
         TextField usernameField = new TextField();
+        usernameField.setText("Tester");
         HBox usernameGroup = new HBox();
         usernameGroup.getChildren().addAll(usernameLabel, usernameField);
         usernameGroup.setSpacing(10);
 
         StackPane root = new StackPane();
         VBox serverDetailsBox = new VBox();
-        serverDetailsBox.getChildren().addAll(serverIpGroup, usernameGroup, btn);
+        serverDetailsBox.getChildren().addAll(serverIpGroup, usernameGroup, btn, start);
         serverDetailsBox.setSpacing(10);
         serverDetailsBox.setAlignment(Pos.TOP_CENTER);
-        
-        btn.setOnAction(new EventHandler<ActionEvent>() {
 
-            @Override
-            public void handle(ActionEvent event) {
-                Connection connection = new Connection(serverIpField.getText(), new Integer(serverPortField.getText()), usernameField.getText());
-                new Thread(connection).start();
-                connection.login((Result result)-> loginCb.onLogin(null, connection), (Result result)->loginCb.onLogin(result, null));
-            }
+        Connection connection = new Connection();
+        btn.setOnAction((ActionEvent event) -> {
+            connection.setConnection(serverIpField.getText(), new Integer(serverPortField.getText()), usernameField.getText());
+            connection.setConnectionCb((Result result) -> loginCb.onLogin(null, connection), (Result result) -> loginCb.onLogin(result, null));
+            new Thread(connection).start();
+        });
+        
+        start.setOnAction((ActionEvent event) -> {
+            connection.execute(ServerCommands.StartGame, (result) -> {
+                System.out.println(result);
+            });
         });
 
         root.getChildren().addAll(serverDetailsBox);

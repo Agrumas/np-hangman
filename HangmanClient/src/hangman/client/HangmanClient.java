@@ -24,7 +24,7 @@ public class HangmanClient extends Application {
                 System.out.println("Error when trying to connect!" + err);
                 return;
             }
-            
+            System.out.println("User connected");
             connection = conn;
         });
         loginScreen.display(primaryStage);

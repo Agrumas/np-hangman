@@ -5,6 +5,7 @@
  */
 package hangman.client;
 
+import hangman.common.ResultCallback;
 import hangman.common.Command;
 import hangman.common.Result;
 import hangman.common.ServerCommands;
@@ -14,6 +15,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.HashMap;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -32,35 +35,63 @@ public class Connection implements Runnable {
     protected String host;
     protected String name;
     protected int port;
+    protected boolean connected = false;
+    protected ResultCallback connectCb;
+    protected ResultCallback error;
 
-    public Connection(String host, int port, String name) {
+    protected HashMap<UUID, Command> waitingQueue;
+
+    public Connection() {
+        this.waitingQueue = new HashMap<>();
+    }
+    
+    public void setConnection(String host, int port, String name) {
         this.host = host;
         this.name = name;
         this.port = port;
     }
 
+    public void setConnectionCb(ResultCallback connectCb, ResultCallback error) {
+        this.connectCb = connectCb;
+        this.error = error;
+    }
+
     @Override
     public void run() {
-
         try {
             clientSocket = new Socket(host, port);
-            in = new BufferedInputStream(clientSocket.getInputStream());
-            out = new BufferedOutputStream(clientSocket.getOutputStream());
-
+            init(connectCb, error);
+            while (clientSocket.isClosed()) {
+                Result res;
+                try {
+                    res = (Result) ois.readObject();
+                    Command cmd = waitingQueue.remove(res.inReply);
+                    if (cmd != null) {
+                        cmd.dispatch(res);
+                    }
+                } catch (ClassNotFoundException ex) {
+                    if (error != null) {
+                        error.invoke(new Result("ClassNotFoundException", ex.getMessage(), true));
+                    }
+                }
+            }
         } catch (IOException ex) {
             Logger.getLogger(Connection.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
-    public void login(ResultCallback cb, ResultCallback error) {
+    protected void init(ResultCallback cb, ResultCallback error) {
         try {
+            in = new BufferedInputStream(clientSocket.getInputStream());
+            out = new BufferedOutputStream(clientSocket.getOutputStream());
+            System.out.println("Connecting..");
             ous = new ObjectOutputStream(out);
             ous.writeObject(new Command(ServerCommands.Login, name));
             ous.flush();
-
+            ois = new ObjectInputStream(in);
+            
             Result res;
             try {
-                ois = new ObjectInputStream(in);
                 res = (Result) ois.readObject();
                 if (!res.isError()) {
                     cb.invoke(res);
@@ -75,14 +106,25 @@ public class Connection implements Runnable {
         }
     }
 
+    public void execute(ServerCommands command, ResultCallback cb) {
+        execute(command, "", cb, null);
+    }
+    
+    public void execute(ServerCommands command, ResultCallback cb, ResultCallback error) {
+        execute(command, "", cb, error);
+    }
+    
     public void execute(ServerCommands command, String data, ResultCallback cb) {
         execute(command, data, cb, null);
     }
 
     public void execute(ServerCommands command, String data, ResultCallback cb, ResultCallback error) {
+        Command cmd = new Command(command, data);
+        cmd.setCallbacks(connectCb, error);
         try {
-            ous.writeObject(new Command(command, data));
+            ous.writeObject(cmd);
             ous.flush();
+            waitingQueue.put(cmd.id, cmd);
             Result res;
             try {
                 res = (Result) ois.readObject();

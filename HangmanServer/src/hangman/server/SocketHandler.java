@@ -28,8 +28,6 @@ public class SocketHandler implements Runnable {
     protected Player player = null;
     protected GameManager game;
 
-    protected static Result CMD_NOT_FOUND = new Result("ERR_NOT_FOUND", "Command is not found", true);
-
     public SocketHandler(Socket clientSocket, GameManager game) {
         this.clientSocket = clientSocket;
         this.game = game;
@@ -47,18 +45,25 @@ public class SocketHandler implements Runnable {
 
             while (!clientSocket.isClosed()) {
                 Command cmd = (Command) ois.readObject();
-                Result answ = CMD_NOT_FOUND;
+                Result answ;
 
                 System.out.println(cmd);
                 switch (cmd.name) {
                     case Login:
                         // should handle duplicate names
                         player = game.register(cmd.data);
-                        answ = new Result("OK");
+                        answ = cmd.result("OK");
                         break;
                     case Quit:
-                        answ = new Result("OK");
+                        answ = cmd.result("OK");
                         System.out.println("Player leaved");
+                        break;
+                    case StartGame:
+                        game.startGame(player);
+                        answ = cmd.result("STARTED", player.getStatus());
+                        break;
+                    default:
+                        answ = cmd.error("ERR_NOT_FOUND", "Command is not found");
                         break;
                 }
 

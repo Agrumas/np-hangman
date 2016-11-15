@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package hangman.client;
+package hangman.common;
 
 import hangman.common.Result;
 

@@ -5,3 +5,6 @@
 /HangmanCommon/build/
 /HangmanServer/build/
 /DummyClient/build/
+/HangmanClient/build/
+/HangmanCommon/dist/
+/HangmanClient/dist/
