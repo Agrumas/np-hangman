@@ -18,13 +18,13 @@ public class PlayersList {
         list = new HashMap<>();
     }
     
-    public Player add(String name){
+    public synchronized Player add(String name){
         Player p = new Player(name);
         list.put(name, p);
         return p;
     }
     
-    public void remove(String name){
+    public synchronized void remove(String name){
         list.remove(name);
     }
 }

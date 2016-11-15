@@ -7,6 +7,7 @@ package dummyclient;
 
 import hangman.common.Command;
 import hangman.common.Result;
+import hangman.common.ServerCommands;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -39,7 +40,7 @@ public class DummyClient {
             ous = new ObjectOutputStream(out);
             System.out.println("Client up");            
             
-            ous.writeObject(new Command("login", "user"));
+            ous.writeObject(new Command(ServerCommands.Login, "user"));
             ous.flush();
             Result res = null;
             try {

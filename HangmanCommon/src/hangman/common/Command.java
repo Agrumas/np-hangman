@@ -12,14 +12,14 @@ import java.io.Serializable;
  * @author Algirdas
  */
 public class Command implements Serializable {
-    public String name;
+    public ServerCommands name;
     public String data;
 
-    public Command(String name) {
+    public Command(ServerCommands name) {
         this(name, "");
     }
    
-    public Command(String name, String data) {
+    public Command(ServerCommands name, String data) {
         this.name = name;
         this.data = data;
     }

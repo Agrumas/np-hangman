@@ -51,12 +51,12 @@ public class SocketHandler implements Runnable {
 
                 System.out.println(cmd);
                 switch (cmd.name) {
-                    case "login":
+                    case Login:
                         // should handle duplicate names
                         player = game.register(cmd.data);
                         answ = new Result("OK");
                         break;
-                    case "quit":
+                    case Quit:
                         answ = new Result("OK");
                         System.out.println("Player leaved");
                         break;
