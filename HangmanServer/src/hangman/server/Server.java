@@ -17,10 +17,10 @@ public class Server implements Runnable {
 
     private static final int PORT = 4444;
     
-    protected GameManager game;
+    protected CommandProcessor processor;
 
     public Server(GameManager game) {
-        this.game = game;
+        processor = new CommandProcessor(game);
     }
 
     @Override
@@ -33,7 +33,7 @@ public class Server implements Runnable {
             System.out.println("Server listen on port: " + PORT);
             while (listening) {
                 Socket clientSocket = serverSocket.accept();
-                new Thread(new SocketHandler(clientSocket, game)).start();
+                new Thread(new SocketHandler(clientSocket, processor)).start();
             }
             serverSocket.close();
         } catch (IOException e) {

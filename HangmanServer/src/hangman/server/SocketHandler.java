@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -24,13 +25,12 @@ import java.util.logging.Logger;
 public class SocketHandler implements Runnable {
 
     protected Socket clientSocket = null;
-    protected String serverText = null;
     protected Player player = null;
-    protected GameManager game;
+    protected CommandProcessor processor;
 
-    public SocketHandler(Socket clientSocket, GameManager game) {
+    public SocketHandler(Socket clientSocket, CommandProcessor processor) {
         this.clientSocket = clientSocket;
-        this.game = game;
+        this.processor = processor;
     }
 
     public void run() {
@@ -45,26 +45,11 @@ public class SocketHandler implements Runnable {
 
             while (!clientSocket.isClosed()) {
                 Command cmd = (Command) ois.readObject();
-                Result answ;
 
                 System.out.println(cmd);
-                switch (cmd.name) {
-                    case Login:
-                        // should handle duplicate names
-                        player = game.register(cmd.data);
-                        answ = cmd.result("OK");
-                        break;
-                    case Quit:
-                        answ = cmd.result("OK");
-                        System.out.println("Player leaved");
-                        break;
-                    case StartGame:
-                        game.startGame(player);
-                        answ = cmd.result("STARTED", player.getStatus());
-                        break;
-                    default:
-                        answ = cmd.error("ERR_NOT_FOUND", "Command is not found");
-                        break;
+                Result answ = processor.process(cmd, player, this);
+                if (answ == null) {
+                    answ = cmd.error("ERR_NOT_FOUND", "Command is not found");
                 }
 
                 ous.writeObject(answ);
@@ -74,11 +59,11 @@ public class SocketHandler implements Runnable {
                     ois.close();
                 }
             }
-        } catch (EOFException e) {
+        } catch (EOFException | SocketException e) {
             if (player != null) {
                 // drop player from game
-                System.out.println("Connection closed");
             }
+            System.out.println("Connection closed");
         } catch (IOException e) {
             //report exception somewhere.
             e.printStackTrace();
@@ -86,4 +71,13 @@ public class SocketHandler implements Runnable {
             Logger.getLogger(SocketHandler.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+
+    public Player getPlayer() {
+        return player;
+    }
+
+    public void setPlayer(Player player) {
+        this.player = player;
+    }
+
 }
