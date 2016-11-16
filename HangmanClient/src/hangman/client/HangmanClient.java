@@ -5,7 +5,10 @@
  */
 package hangman.client;
 
+import hangman.client.screen.GameScreen;
+import hangman.client.screen.Login;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.stage.Stage;
 
 /**
@@ -15,20 +18,23 @@ import javafx.stage.Stage;
 public class HangmanClient extends Application {
     
     protected Connection connection;
+    protected Game game;
 
     @Override
     public void start(Stage primaryStage) {
         primaryStage.setTitle("Hangman");
-        Login loginScreen = new Login((err, conn) -> {
+        Login loginScreen = new Login((err, game) -> {
             if(err != null) {
                 System.out.println("Error when trying to connect!" + err);
                 return;
             }
             System.out.println("User connected");
-            connection = conn;
+            this.game = game;
+            Platform.runLater(new GameScreen(primaryStage, game));
         });
         loginScreen.display(primaryStage);
     }
+   
 
     /**
      * @param args the command line arguments

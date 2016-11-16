@@ -3,8 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package hangman.client;
+package hangman.client.screen;
 
+import hangman.client.Connection;
+import hangman.client.Game;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -32,7 +34,7 @@ public class Login {
 
     public interface LoginResponse {
 
-        void onLogin(Object error, Connection connection);
+        void onLogin(Object error, Game game);
     }
 
     protected Scene scene;
@@ -70,12 +72,17 @@ public class Login {
         serverDetailsBox.setAlignment(Pos.TOP_CENTER);
 
         Connection connection = new Connection();
+        Game game = new Game("Guest", connection);
         btn.setOnAction((ActionEvent event) -> {
+            game.setName(usernameField.getText());
             connection.setConnection(serverIpField.getText(), new Integer(serverPortField.getText()), usernameField.getText());
-            connection.setConnectionCb((Result result) -> loginCb.onLogin(null, connection), (Result result) -> loginCb.onLogin(result, null));
+            connection.setConnectionCb((Result result) -> {
+                game.updateState(result.getData());
+                loginCb.onLogin(null, game);
+            }, (Result result) -> loginCb.onLogin(result, null));
             new Thread(connection).start();
         });
-        
+
         start.setOnAction((ActionEvent event) -> {
             connection.execute(ServerCommands.StartGame, (result) -> {
                 System.out.println(result);
