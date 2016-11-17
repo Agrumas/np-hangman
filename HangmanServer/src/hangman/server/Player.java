@@ -78,11 +78,12 @@ public class Player {
             }
 
         }
-        if (guessesLeft > 0) {
-            guessesLeft--;
+        if (--guessesLeft > 0) {
             return GuessResult.Wrong;
         }
-        score--;
+        if (score > 0) {
+            score--;
+        }
         guessWord = word;
         return GuessResult.Failed;
     }

@@ -5,11 +5,14 @@
  */
 package hangman.server;
 
+import hangman.common.GuessResult;
+
 /**
  *
  * @author Algirdas
  */
 public class GameManager {
+
     protected PlayersList players;
     protected Dictionary dic;
 
@@ -17,21 +20,22 @@ public class GameManager {
         players = new PlayersList();
         dic = new Dictionary();
         dic.readWordFile();
-        dic.getRandomWord();
     }
-       
-    
-    public Player register(String name){
+
+    public Player register(String name) {
         return players.add(name);
     }
-    
-    public String startGame(Player p){
-        // some kind of Dictionary class is needed to read all words and return one randomly
-        return p.startGuessing("new guess word");
+
+    public void unregister(Player p) {
+        players.remove(p.name);
     }
-    
-    public String guess(Player p, String data){
-        return p.guess(data).toString();
+
+    public String startGame(Player p) {
+        return p.startGuessing(dic.getRandomWord());
     }
-    
+
+    public GuessResult guess(Player p, String data) {
+        return p.guess(data);
+    }
+
 }

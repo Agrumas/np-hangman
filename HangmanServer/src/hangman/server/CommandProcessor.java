@@ -6,7 +6,9 @@
 package hangman.server;
 
 import hangman.common.Command;
+import hangman.common.GuessResult;
 import hangman.common.Result;
+import hangman.common.ServerCommands;
 
 /**
  *
@@ -22,23 +24,29 @@ public class CommandProcessor {
     }
 
     public Result process(Command cmd, Player player, SocketHandler connection) {
-        // here commands with logic meets
-        switch (cmd.name) {
-            case Login:
-                // @Todo handle duplicate names
-                // for example here we add a new player
+        if (player == null) {
+            if (cmd.name == ServerCommands.Login) {
                 Player newPlayer = game.register(cmd.data);
+                if(newPlayer == null){
+                    return cmd.error("NAME_IN_USE", "The name is already in use");
+                }
                 connection.setPlayer(newPlayer);
                 return cmd.result("OK");
+            }
+            return null;
+        }
+        
+        switch (cmd.name) {
             case Quit:
                 System.out.println("Player leaved");
+                game.unregister(player);
                 return cmd.result("OK");
             case StartGame:
                 game.startGame(player);
                 return cmd.result("STARTED", player.getStatus());
             case Guess:
-                game.guess(player, cmd.data);
-                return cmd.result("Guessed/faild",player.startGuessing(cmd.data));
+                GuessResult result = game.guess(player, cmd.data);
+                return cmd.result(result.toString(), player.getStatus());
         }
         return null;
     }

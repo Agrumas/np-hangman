@@ -7,6 +7,7 @@ package hangman.server;
 
 import hangman.common.Command;
 import hangman.common.Result;
+import hangman.common.ServerCommands;
 import java.io.EOFException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -54,6 +55,11 @@ public class SocketHandler implements Runnable {
                 if (answ == null) {
                     answ = cmd.error("ERR_NOT_FOUND", "Command is not found");
                 }
+//                try {
+//                    Thread.sleep(2000);
+//                } catch (InterruptedException ex) {
+//                    Logger.getLogger(SocketHandler.class.getName()).log(Level.SEVERE, null, ex);
+//                }
 
                 ous.writeObject(answ);
                 ous.flush();
@@ -67,6 +73,7 @@ public class SocketHandler implements Runnable {
                 // drop player from game
             }
             System.out.println("Connection closed");
+            processor.process(new Command(ServerCommands.Quit), player, this);
         } catch (IOException e) {
             //report exception somewhere.
             e.printStackTrace();

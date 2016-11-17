@@ -12,6 +12,7 @@ import java.util.HashMap;
  * @author Algirdas
  */
 public class PlayersList {
+
     protected HashMap<String, Player> list;
 
     /**
@@ -20,14 +21,15 @@ public class PlayersList {
     public PlayersList() {
         list = new HashMap<>();
     }
-    
-    public synchronized Player add(String name){
-        Player p = new Player(name);
-        list.put(name, p);
-        return p;
+
+    public synchronized Player add(String name) {
+        if (list.containsKey(name)) {
+            return null;
+        }
+        return list.put(name, new Player(name));
     }
-    
-    public synchronized void remove(String name){
+
+    public synchronized void remove(String name) {
         list.remove(name);
     }
 }
