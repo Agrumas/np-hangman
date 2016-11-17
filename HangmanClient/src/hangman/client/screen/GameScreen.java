@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.text.Text;
@@ -72,44 +73,40 @@ public class GameScreen implements Runnable {
         Game.GameStateCallback uiGameStart = (gamesState) -> {
             btnStart.setDisable(true);
             boxGuess.setDisable(false);
-            txtName.setText("Guess a letter or a word!");
+            txtStatus.setText("Guess a letter or a word!");
             this.updateView(gamesState);
         };
 
         btnStart.setOnAction((ActionEvent event) -> {
+            btnStart.setVisible(false);
             game.start(uiGameStart);
         });
 
-        btnGuess.setOnAction((ActionEvent event) -> {
-            String word = inGuess.getText();
+        EventHandler<ActionEvent> onSubmit = (ActionEvent event) -> {
+            String word = inGuess.getText().trim().toLowerCase();
+            if (word.isEmpty()) {
+                return;
+            }
+            
+            if (!word.matches("[a-zA-Z]+")) {
+                txtStatus.setText("Invalid character, only letters are allowed!");
+                inGuess.setText("");
+                return;
+            }
+            boxGuess.setDisable(true);
             game.guess(word, (gamesState) -> {
-                switch (gamesState.getGuessResult()) {
-                    case Correct:
-                        txtName.setText("Your guess is correct!");
-                        break;
-                    case Duplicate:
-                        txtName.setText("Letter was tried. Letters: " + getGuesses(gamesState));
-                        break;
-                    case Failed:
-                        txtName.setText("Game Over! The correct word was: " + gamesState.guessWord);
-                        btnStart.setDisable(false);
-                        boxGuess.setDisable(true);
-                        break;
-                    case Guessed:
-                        txtName.setText("Congratulations! You have guessed the word.");
-                        btnStart.setDisable(false);
-                        boxGuess.setDisable(true);
-                        break;
-                    case Wrong:
-                        txtName.setText("Missed! Tried letters: " + getGuesses(gamesState));
-                        break;
-                }
+                boxGuess.setDisable(false);
+                updateStatusText(gamesState);
                 inGuess.setText("");
                 this.updateView(gamesState);
             }, (error) -> {
+                boxGuess.setDisable(false);
                 showErrorModal("Can not submit guess", error.getData());
             });
-        });
+        };
+
+        btnGuess.setOnAction(onSubmit);
+        inGuess.setOnAction(onSubmit);
 
         game.start((gamesState) -> {
             uiGameStart.invoke(gamesState);
@@ -126,6 +123,32 @@ public class GameScreen implements Runnable {
 
     protected void showErrorModal(String title, String message) {
         JOptionPane.showMessageDialog(null, message, title, JOptionPane.ERROR_MESSAGE);
+    }
+
+    protected void updateStatusText(GameState state) {
+        switch (state.getGuessResult()) {
+            case Correct:
+                txtStatus.setText("Your guess is correct!");
+                break;
+            case Duplicate:
+                txtStatus.setText("Letter was tried. Letters: " + getGuesses(state));
+                break;
+            case Failed:
+                txtStatus.setText("Game Over! The correct word was:");
+                btnStart.setDisable(false);
+                boxGuess.setDisable(true);
+                btnStart.setVisible(true);
+                break;
+            case Guessed:
+                txtStatus.setText("Congratulations! You have guessed the word.");
+                btnStart.setVisible(true);
+                btnStart.setDisable(false);
+                boxGuess.setDisable(true);
+                break;
+            case Wrong:
+                txtStatus.setText("Missed! Tried letters: " + getGuesses(state));
+                break;
+        }
     }
 
     protected void updateView(GameState state) {

@@ -61,11 +61,12 @@ public class Connection implements Runnable {
         try {
             clientSocket = new Socket(host, port);
             init(connectCb, error);
-            while (clientSocket.isClosed()) {
-                Result res;
+            Result res;
+            Command cmd;
+            while (!clientSocket.isClosed()) {
                 try {
                     res = (Result) ois.readObject();
-                    Command cmd = waitingQueue.remove(res.inReply);
+                    cmd = waitingQueue.remove(res.inReply);
                     if (cmd != null) {
                         cmd.dispatch(res);
                     }
@@ -123,24 +124,11 @@ public class Connection implements Runnable {
 
     public void execute(ServerCommands command, String data, ResultCallback cb, ResultCallback error) {
         Command cmd = new Command(command, data);
-        cmd.setCallbacks(connectCb, error);
+        cmd.setCallbacks(cb, error);
+        waitingQueue.put(cmd.id, cmd);
         try {
             ous.writeObject(cmd);
             ous.flush();
-            waitingQueue.put(cmd.id, cmd);
-            Result res;
-            try {
-                res = (Result) ois.readObject();
-                if (!res.isError()) {
-                    cb.invoke(res);
-                } else if (error != null) {
-                    error.invoke(res);
-                }
-            } catch (ClassNotFoundException ex) {
-                if (error != null) {
-                    error.invoke(new Result("ClassNotFoundException", ex.getMessage(), true));
-                }
-            }
         } catch (IOException ex) {
             if (error != null) {
                 error.invoke(new Result("IOException", ex.getMessage(), true));

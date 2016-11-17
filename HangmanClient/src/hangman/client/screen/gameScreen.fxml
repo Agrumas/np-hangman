@@ -31,7 +31,7 @@
          <children>
             <HBox alignment="CENTER" prefHeight="32.0" prefWidth="560.0">
                <children>
-                  <Text fx:id="txtStatus" strokeType="OUTSIDE" strokeWidth="0.0" text="Guess a letter or a word!" wrappingWidth="163.4453125">
+                  <Text fx:id="txtStatus" strokeType="OUTSIDE" strokeWidth="0.0" text="Guess a letter or a word!" textAlignment="CENTER" wrappingWidth="491.4453125">
                      <font>
                         <Font size="14.0" />
                      </font>

@@ -70,7 +70,7 @@ public class Game {
             return;
         }
         connection.execute(ServerCommands.Guess, data, (Result result) -> {
-            updateState(result.getData());
+            updateState(result.getData(), result.getType());
             Platform.runLater(() -> {
                 callback.invoke(state);
             });
