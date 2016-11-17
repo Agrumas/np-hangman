@@ -16,6 +16,12 @@ public class HangmanServer {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+        
+//        Player player = new Player("");
+//        player.startGuessing("programming");
+//        player.guessWord = "-rogra--ing";
+//        player.guess("m");
+//        player.guess("p");
         /**
          * GameManager is responsible for Hangman logic
          */

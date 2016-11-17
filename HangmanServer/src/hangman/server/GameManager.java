@@ -32,7 +32,7 @@ public class GameManager {
     }
     
     public String guess(Player p, String data){
-        return p.guess(data);
+        return p.guess(data).toString();
     }
     
 }

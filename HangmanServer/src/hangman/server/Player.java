@@ -5,6 +5,8 @@
  */
 package hangman.server;
 
+import hangman.common.GuessResult;
+
 /**
  *
  * @author Algirdas
@@ -35,25 +37,53 @@ public class Player {
 
     /**
      * Tracks state of players game
-     * @param name 
+     *
+     * @param name
      */
     public Player(String name) {
         this.name = name;
     }
 
     public String startGuessing(String word) {
-        this.word = word;
+        this.word = word.toLowerCase();
         guessesLeft = word.length();
         guessWord = word.replaceAll(".", "-");
         guesses = "";
         return guessWord;
     }
 
-    public String guess(String data) {
-        if(true){
+    public GuessResult guess(String data) {
+        data = data.toLowerCase();
+        if (data.length() > 1) {
+            if (data.equals(word)) {
+                score++;
+                return GuessResult.Guessed;
+            }
+        } else {
+            // make the comparision
+            guesses = guesses + data;
+            StringBuilder myWord = new StringBuilder(guessWord);
+            int pos = -1;
+            while ((pos = word.indexOf(data, pos + 1)) != -1) {
+                myWord.setCharAt(pos, data.charAt(0));
+            }
+
+            if (!guessWord.equals(myWord.toString())) {
+                guessWord = myWord.toString();
+                if (guessWord.equals(word)) {
+                    score++;
+                    return GuessResult.Guessed;
+                }
+                return GuessResult.Correct;
+            }
+
         }
-        
-        return getStatus();
+        if (guessesLeft > 0) {
+            guessesLeft--;
+            return GuessResult.Wrong;
+        }
+        score--;
+        return GuessResult.Failed;
     }
 
     // based on this string client will show information about game
