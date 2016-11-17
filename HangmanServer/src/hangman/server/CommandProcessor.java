@@ -43,6 +43,7 @@ public class CommandProcessor {
                 return cmd.result("OK");
             case StartGame:
                 game.startGame(player);
+                //return cmd.result("STARTED", player.word);
                 return cmd.result("STARTED", player.getStatus());
             case Guess:
                 GuessResult result = game.guess(player, cmd.data);
