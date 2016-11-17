@@ -6,7 +6,6 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="351.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <top>
       <HBox alignment="CENTER_LEFT" prefHeight="74.0" prefWidth="600.0" BorderPane.alignment="CENTER">
@@ -32,7 +31,7 @@
          <children>
             <HBox alignment="CENTER" prefHeight="32.0" prefWidth="560.0">
                <children>
-                  <Text fx:id="txtStatus" strokeType="OUTSIDE" strokeWidth="0.0" text="Guess a letter or a word!" wrappingWidth="163.4453125">
+                  <Text fx:id="txtStatus" strokeType="OUTSIDE" strokeWidth="0.0" text="Guess a letter or a word!" textAlignment="CENTER" wrappingWidth="491.4453125">
                      <font>
                         <Font size="14.0" />
                      </font>
@@ -48,9 +47,9 @@
                   </Text>
                </children>
             </HBox>
-            <HBox prefHeight="70.0" prefWidth="485.0">
+            <HBox fx:id="boxGuess" disable="true" prefHeight="70.0" prefWidth="485.0">
                <children>
-                  <VBox fx:id="boxGuess" disable="true" prefHeight="71.0" prefWidth="405.0">
+                  <VBox prefHeight="71.0" prefWidth="405.0">
                      <children>
                         <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Guess a letter or a word:">
                            <font>
@@ -74,14 +73,22 @@
                   </Button>
                </children>
             </HBox>
-            <Button fx:id="btnStart" mnemonicParsing="false" text="Start Game">
-               <VBox.margin>
-                  <Insets left="100.0" />
-               </VBox.margin>
-               <font>
-                  <Font size="18.0" />
-               </font>
-            </Button>
+            <HBox prefHeight="100.0" prefWidth="200.0">
+               <children>
+                  <VBox alignment="CENTER" prefHeight="74.0" prefWidth="447.0">
+                     <children>
+                        <Button fx:id="btnStart" mnemonicParsing="false" text="Continue" textAlignment="CENTER">
+                           <font>
+                              <Font size="18.0" />
+                           </font>
+                           <HBox.margin>
+                              <Insets />
+                           </HBox.margin>
+                        </Button>
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
          </children>
       </VBox>
    </center>

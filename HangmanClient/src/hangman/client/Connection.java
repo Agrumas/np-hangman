@@ -44,7 +44,7 @@ public class Connection implements Runnable {
     public Connection() {
         this.waitingQueue = new HashMap<>();
     }
-    
+
     public void setConnection(String host, int port, String name) {
         this.host = host;
         this.name = name;
@@ -61,11 +61,12 @@ public class Connection implements Runnable {
         try {
             clientSocket = new Socket(host, port);
             init(connectCb, error);
-            while (clientSocket.isClosed()) {
-                Result res;
+            Result res;
+            Command cmd;
+            while (!clientSocket.isClosed()) {
                 try {
                     res = (Result) ois.readObject();
-                    Command cmd = waitingQueue.remove(res.inReply);
+                    cmd = waitingQueue.remove(res.inReply);
                     if (cmd != null) {
                         cmd.dispatch(res);
                     }
@@ -76,6 +77,9 @@ public class Connection implements Runnable {
                 }
             }
         } catch (IOException ex) {
+            if (error != null) {
+                error.invoke(new Result("IOException", ex.getMessage(), true));
+            }
             Logger.getLogger(Connection.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -89,7 +93,7 @@ public class Connection implements Runnable {
             ous.writeObject(new Command(ServerCommands.Login, name));
             ous.flush();
             ois = new ObjectInputStream(in);
-            
+
             Result res;
             try {
                 res = (Result) ois.readObject();
@@ -109,35 +113,22 @@ public class Connection implements Runnable {
     public void execute(ServerCommands command, ResultCallback cb) {
         execute(command, "", cb, null);
     }
-    
+
     public void execute(ServerCommands command, ResultCallback cb, ResultCallback error) {
         execute(command, "", cb, error);
     }
-    
+
     public void execute(ServerCommands command, String data, ResultCallback cb) {
         execute(command, data, cb, null);
     }
 
     public void execute(ServerCommands command, String data, ResultCallback cb, ResultCallback error) {
         Command cmd = new Command(command, data);
-        cmd.setCallbacks(connectCb, error);
+        cmd.setCallbacks(cb, error);
+        waitingQueue.put(cmd.id, cmd);
         try {
             ous.writeObject(cmd);
             ous.flush();
-            waitingQueue.put(cmd.id, cmd);
-            Result res;
-            try {
-                res = (Result) ois.readObject();
-                if (!res.isError()) {
-                    cb.invoke(res);
-                } else if (error != null) {
-                    error.invoke(res);
-                }
-            } catch (ClassNotFoundException ex) {
-                if (error != null) {
-                    error.invoke(new Result("ClassNotFoundException", ex.getMessage(), true));
-                }
-            }
         } catch (IOException ex) {
             if (error != null) {
                 error.invoke(new Result("IOException", ex.getMessage(), true));

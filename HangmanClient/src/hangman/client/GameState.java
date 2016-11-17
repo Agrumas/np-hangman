@@ -5,6 +5,8 @@
  */
 package hangman.client;
 
+import hangman.common.GuessResult;
+
 /**
  *
  * @author Algirdas
@@ -17,15 +19,21 @@ public class GameState {
     public String guessWord;
     public int guessesLeft = 0;
     public String guesses;
+    public GuessResult guessResult;
 
     public GameState(String name) {
         this.name = name;
     }
 
     public void updateState(String playerString) {
+        updateState(playerString, null);
+    }
+    
+    public void updateState(String playerString, GuessResult guessResult) {
         if (!playerString.startsWith("Player")) {
             return;
         }
+        this.guessResult = guessResult;
         
         playerString = playerString.substring(7, playerString.length() - 1);
         String[] keyValuePairs = playerString.split(",");
@@ -85,4 +93,12 @@ public class GameState {
     public String getGuesses() {
         return guesses;
     }
+
+    public GuessResult getGuessResult() {
+        return guessResult;
+    }
+    
+    public void setGuessResultToDuplicate() {
+        guessResult = GuessResult.Duplicate;
+    }    
 }

@@ -12,5 +12,5 @@ import java.io.Serializable;
  * @author Cosar
  */
 public enum GuessResult implements Serializable {
-    Correct, Wrong, Guessed, Failed
+    Correct, Wrong, Guessed, Failed, Duplicate
 }

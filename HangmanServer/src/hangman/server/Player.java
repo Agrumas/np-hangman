@@ -83,6 +83,7 @@ public class Player {
             return GuessResult.Wrong;
         }
         score--;
+        guessWord = word;
         return GuessResult.Failed;
     }
 

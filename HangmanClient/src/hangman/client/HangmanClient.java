@@ -7,16 +7,18 @@ package hangman.client;
 
 import hangman.client.screen.GameScreen;
 import hangman.client.screen.Login;
+import hangman.common.Result;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.stage.Stage;
+import javax.swing.JOptionPane;
 
 /**
  *
  * @author Algirdas
  */
 public class HangmanClient extends Application {
-    
+
     protected Connection connection;
     protected Game game;
 
@@ -24,8 +26,9 @@ public class HangmanClient extends Application {
     public void start(Stage primaryStage) {
         primaryStage.setTitle("Hangman");
         Login loginScreen = new Login((err, game) -> {
-            if(err != null) {
-                System.out.println("Error when trying to connect!" + err);
+            if (err != null) {
+                Result result = (Result) err;
+                JOptionPane.showMessageDialog(null, result.getData(), "Error when trying to connect!", JOptionPane.ERROR_MESSAGE);
                 return;
             }
             System.out.println("User connected");
@@ -34,7 +37,6 @@ public class HangmanClient extends Application {
         });
         loginScreen.display(primaryStage);
     }
-   
 
     /**
      * @param args the command line arguments
@@ -43,4 +45,8 @@ public class HangmanClient extends Application {
         launch(args);
     }
 
+    @Override
+    public void stop() {
+        System.exit(0);
+    }
 }
