@@ -5,33 +5,22 @@
  */
 package hangman.client.screen;
 
-import hangman.client.Connection;
 import hangman.client.Game;
 import hangman.client.GameState;
-import javafx.application.Application;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TextFormatter;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
-import javafx.scene.layout.StackPane;
-import javafx.scene.text.Font;
 import javafx.stage.Stage;
-import javafx.util.converter.IntegerStringConverter;
-
-import hangman.common.Result;
-import hangman.common.ServerCommands;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.text.Text;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -42,9 +31,10 @@ public class GameScreen implements Runnable {
     protected Stage primaryStage;
     protected Game game;
 
-    protected Button btnStart;
+    protected Button btnStart, btnGuess;
     protected Text txtName, txtStatus, txtWord, txtGuessesLeft, txtScore;
-    protected VBox boxGuess;
+    protected HBox boxGuess;
+    protected TextField inGuess;
 
     public GameScreen(Stage primaryStage, Game game) {
         this.primaryStage = primaryStage;
@@ -64,26 +54,78 @@ public class GameScreen implements Runnable {
     public void show(Parent root) {
         Scene scene = new Scene(root, 630, 351);
         primaryStage.setScene(scene);
-        
+
         txtName = (Text) scene.lookup("#txtName");
         txtStatus = (Text) scene.lookup("#txtStatus");
         txtWord = (Text) scene.lookup("#txtWord");
-        
+
         txtGuessesLeft = (Text) scene.lookup("#txtGuessesLeft");
         txtScore = (Text) scene.lookup("#txtScore");
-        
-        boxGuess = (VBox) scene.lookup("#boxGuess");
+
+        boxGuess = (HBox) scene.lookup("#boxGuess");
         btnStart = (Button) scene.lookup("#btnStart");
+        inGuess = (TextField) scene.lookup("#inGuess");
+        btnGuess = (Button) scene.lookup("#btnGuess");
+
+        btnStart.setVisible(false);
+
+        Game.GameStateCallback uiGameStart = (gamesState) -> {
+            btnStart.setDisable(true);
+            boxGuess.setDisable(false);
+            txtName.setText("Guess a letter or a word!");
+            this.updateView(gamesState);
+        };
 
         btnStart.setOnAction((ActionEvent event) -> {
-            game.start((gamesState) -> {
-                btnStart.setDisable(true);
-                boxGuess.setDisable(false);
-                txtName.setText("Guess a letter or a word!");
+            game.start(uiGameStart);
+        });
+
+        btnGuess.setOnAction((ActionEvent event) -> {
+            String word = inGuess.getText();
+            game.guess(word, (gamesState) -> {
+                switch (gamesState.getGuessResult()) {
+                    case Correct:
+                        txtName.setText("Your guess is correct!");
+                        break;
+                    case Duplicate:
+                        txtName.setText("Letter was tried. Letters: " + getGuesses(gamesState));
+                        break;
+                    case Failed:
+                        txtName.setText("Game Over! The correct word was: " + gamesState.guessWord);
+                        btnStart.setDisable(false);
+                        boxGuess.setDisable(true);
+                        break;
+                    case Guessed:
+                        txtName.setText("Congratulations! You have guessed the word.");
+                        btnStart.setDisable(false);
+                        boxGuess.setDisable(true);
+                        break;
+                    case Wrong:
+                        txtName.setText("Missed! Tried letters: " + getGuesses(gamesState));
+                        break;
+                }
+                inGuess.setText("");
                 this.updateView(gamesState);
+            }, (error) -> {
+                showErrorModal("Can not submit guess", error.getData());
             });
         });
-        primaryStage.show();
+
+        game.start((gamesState) -> {
+            uiGameStart.invoke(gamesState);
+            primaryStage.show();
+        });
+    }
+
+    protected String getGuesses(GameState gamesState) {
+        String guessed = gamesState.guesses.toUpperCase();
+        char[] ar = guessed.toCharArray();
+        Arrays.sort(ar);
+        return String.valueOf(ar);
+    }
+
+    protected void showErrorModal(String title, String message) {
+        JOptionPane.showMessageDialog(null, message, title, JOptionPane.ERROR_MESSAGE);
     }
 
     protected void updateView(GameState state) {

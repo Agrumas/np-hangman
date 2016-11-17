@@ -18,7 +18,6 @@ public class GameManager {
         dic = new Dictionary();
         dic.readWordFile();
         dic.getRandomWord();
-        
     }
        
     

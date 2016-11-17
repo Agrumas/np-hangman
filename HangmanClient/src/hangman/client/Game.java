@@ -6,6 +6,7 @@
 package hangman.client;
 
 import hangman.common.ErrorCallback;
+import hangman.common.GuessResult;
 import hangman.common.Result;
 import hangman.common.ResultCallback;
 import hangman.common.ServerCommands;
@@ -40,12 +41,35 @@ public class Game {
         return state;
     }
 
+    public GameState updateState(String stateStr, String guessResult) {
+        state.updateState(stateStr, GuessResult.valueOf(guessResult));
+        return state;
+    }
+
     public void start(GameStateCallback callback) {
         start(callback, null);
     }
-    
+
     public void start(GameStateCallback callback, ErrorCallback errorCb) {
         connection.execute(ServerCommands.StartGame, (Result result) -> {
+            updateState(result.getData());
+            Platform.runLater(() -> {
+                callback.invoke(state);
+            });
+        }, handleError(errorCb));
+    }
+
+    public void guess(String data, GameStateCallback callback, ErrorCallback errorCb) {
+        if (data.isEmpty()) {
+            return;
+        }
+
+        if (data.length() == 1 && state.guesses.contains(data)) {
+            state.setGuessResultToDuplicate();
+            callback.invoke(state);
+            return;
+        }
+        connection.execute(ServerCommands.Guess, data, (Result result) -> {
             updateState(result.getData());
             Platform.runLater(() -> {
                 callback.invoke(state);

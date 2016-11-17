@@ -25,6 +25,7 @@ import javafx.util.converter.IntegerStringConverter;
 
 import hangman.common.Result;
 import hangman.common.ServerCommands;
+import javafx.geometry.Insets;
 
 /**
  *
@@ -40,10 +41,8 @@ public class Login {
     protected Scene scene;
 
     public Login(LoginResponse loginCb) {
-        Button btn = new Button();
-        btn.setText("Connect");
-        Button start = new Button();
-        start.setText("Start Game");
+        Button btnStart = new Button();
+        btnStart.setText("Start Game");
 
         Label serverIpLabel = new Label("Server:");
         serverIpLabel.setFont(new Font("", 20));
@@ -67,26 +66,21 @@ public class Login {
 
         StackPane root = new StackPane();
         VBox serverDetailsBox = new VBox();
-        serverDetailsBox.getChildren().addAll(serverIpGroup, usernameGroup, btn, start);
+        serverDetailsBox.setPadding(new Insets(60, 0, 0, 10));
+        serverDetailsBox.getChildren().addAll(serverIpGroup, usernameGroup, btnStart);
         serverDetailsBox.setSpacing(10);
         serverDetailsBox.setAlignment(Pos.TOP_CENTER);
 
         Connection connection = new Connection();
         Game game = new Game("Guest", connection);
-        btn.setOnAction((ActionEvent event) -> {
+        btnStart.setOnAction((ActionEvent event) -> {
             game.setName(usernameField.getText());
             connection.setConnection(serverIpField.getText(), new Integer(serverPortField.getText()), usernameField.getText());
             connection.setConnectionCb((Result result) -> {
                 game.updateState(result.getData());
-                loginCb.onLogin(null, game);
+                    loginCb.onLogin(null, game);
             }, (Result result) -> loginCb.onLogin(result, null));
             new Thread(connection).start();
-        });
-
-        start.setOnAction((ActionEvent event) -> {
-            connection.execute(ServerCommands.StartGame, (result) -> {
-                System.out.println(result);
-            });
         });
 
         root.getChildren().addAll(serverDetailsBox);

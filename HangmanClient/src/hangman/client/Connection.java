@@ -44,7 +44,7 @@ public class Connection implements Runnable {
     public Connection() {
         this.waitingQueue = new HashMap<>();
     }
-    
+
     public void setConnection(String host, int port, String name) {
         this.host = host;
         this.name = name;
@@ -76,6 +76,9 @@ public class Connection implements Runnable {
                 }
             }
         } catch (IOException ex) {
+            if (error != null) {
+                error.invoke(new Result("IOException", ex.getMessage(), true));
+            }
             Logger.getLogger(Connection.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -89,7 +92,7 @@ public class Connection implements Runnable {
             ous.writeObject(new Command(ServerCommands.Login, name));
             ous.flush();
             ois = new ObjectInputStream(in);
-            
+
             Result res;
             try {
                 res = (Result) ois.readObject();
@@ -109,11 +112,11 @@ public class Connection implements Runnable {
     public void execute(ServerCommands command, ResultCallback cb) {
         execute(command, "", cb, null);
     }
-    
+
     public void execute(ServerCommands command, ResultCallback cb, ResultCallback error) {
         execute(command, "", cb, error);
     }
-    
+
     public void execute(ServerCommands command, String data, ResultCallback cb) {
         execute(command, data, cb, null);
     }
