@@ -26,7 +26,9 @@ public class PlayersList {
         if (list.containsKey(name)) {
             return null;
         }
-        return list.put(name, new Player(name));
+        Player p = new Player(name);
+        list.put(name, p);
+        return p;
     }
 
     public synchronized void remove(String name) {
