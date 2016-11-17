@@ -11,9 +11,14 @@ package hangman.server;
  */
 public class GameManager {
     protected PlayersList players;
+    protected Dictionary dic;
 
     public GameManager() {
         players = new PlayersList();
+        dic = new Dictionary();
+        dic.readWordFile();
+        dic.getRandomWord();
+        
     }
        
     
@@ -22,10 +27,12 @@ public class GameManager {
     }
     
     public String startGame(Player p){
+        // some kind of Dictionary class is needed to read all words and return one randomly
         return p.startGuessing("new guess word");
     }
     
     public String guess(Player p, String data){
         return p.guess(data);
     }
+    
 }

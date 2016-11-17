@@ -16,8 +16,11 @@ public class HangmanServer {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+        /**
+         * GameManager is responsible for Hangman logic
+         */
         GameManager game = new GameManager();
-        new Thread(new Server(game)).start();
+        new Thread(new Server(game)).start(); //server handles connection with client
     }
     
 }

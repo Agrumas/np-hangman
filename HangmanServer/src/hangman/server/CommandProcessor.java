@@ -21,9 +21,11 @@ public class CommandProcessor {
     }
 
     public Result process(Command cmd, Player player, SocketHandler connection) {
+        // here commands with logic meets, logic should be in GameManager
         switch (cmd.name) {
             case Login:
                 // @Todo handle duplicate names
+                // for example here we add a new player
                 Player newPlayer = game.register(cmd.data);
                 connection.setPlayer(newPlayer);
                 return cmd.result("OK");

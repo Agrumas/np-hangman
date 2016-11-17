@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 public class DummyClient {
 
     /**
+     * To debug this can be used
      * @param args the command line arguments
      */
     public static void main(String[] args) {
@@ -39,13 +40,14 @@ public class DummyClient {
             
             ous = new ObjectOutputStream(out);
             System.out.println("Client up");            
-            
+            // sends command to server
             ous.writeObject(new Command(ServerCommands.Login, "user"));
             ous.flush();
             Result res = null;
             try {
                 ois = new ObjectInputStream(in);
                 res = (Result) ois.readObject();
+                // gets response
             } catch (ClassNotFoundException ex) {
                 Logger.getLogger(DummyClient.class.getName()).log(Level.SEVERE, null, ex);
             }

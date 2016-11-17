@@ -12,12 +12,31 @@ package hangman.server;
 public class Player {
 
     public String name;
+    /**
+     * Total score
+     */
     public int score = 0;
+    /**
+     * Word to guess 'programming'
+     */
     public String word;
+    /**
+     * Word visible to player 'pro----'
+     */
     public String guessWord;
+    /**
+     * Time how much he can guess till loosing
+     */
     public int guessesLeft = 0;
+    /**
+     * Letters he tried 'wq..'
+     */
     public String guesses;
 
+    /**
+     * Tracks state of players game
+     * @param name 
+     */
     public Player(String name) {
         this.name = name;
     }
@@ -31,9 +50,13 @@ public class Player {
     }
 
     public String guess(String data) {
-        return "";
+        if(true){
+        }
+        
+        return getStatus();
     }
 
+    // based on this string client will show information about game
     public String getStatus() {
         return "Player{" + "name=" + name + ", score=" + score + ", guessWord=" + guessWord + ", guessesLeft=" + guessesLeft + ", guesses=" + guesses + '}';
     }

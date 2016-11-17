@@ -29,9 +29,11 @@ public class Server implements Runnable {
         ServerSocket serverSocket;
 
         try {
+            //listen for a new connection
             serverSocket = new ServerSocket(PORT);
             System.out.println("Server listen on port: " + PORT);
             while (listening) {
+                // new connection received, move communication with it to different thread
                 Socket clientSocket = serverSocket.accept();
                 new Thread(new SocketHandler(clientSocket, processor)).start();
             }

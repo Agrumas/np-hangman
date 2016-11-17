@@ -35,8 +35,8 @@ public class SocketHandler implements Runnable {
 
     public void run() {
         try {
+            // sending/receiving data between client and server
             InputStream input = clientSocket.getInputStream();
-
             ObjectInputStream ois = new ObjectInputStream(input);
             OutputStream output = clientSocket.getOutputStream();
             ObjectOutputStream ous = new ObjectOutputStream(output);
@@ -44,9 +44,12 @@ public class SocketHandler implements Runnable {
             System.out.println("New client connected");
 
             while (!clientSocket.isClosed()) {
+                // ObjectInputStream, transfering not plain text, but objects
+                // in our case Command object, its in common
                 Command cmd = (Command) ois.readObject();
 
                 System.out.println(cmd);
+                // we got proccesor, which handles those commands
                 Result answ = processor.process(cmd, player, this);
                 if (answ == null) {
                     answ = cmd.error("ERR_NOT_FOUND", "Command is not found");

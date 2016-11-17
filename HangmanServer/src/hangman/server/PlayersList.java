@@ -14,6 +14,9 @@ import java.util.HashMap;
 public class PlayersList {
     protected HashMap<String, Player> list;
 
+    /**
+     * PlayersList is more or less wrapper of HashMap
+     */
     public PlayersList() {
         list = new HashMap<>();
     }

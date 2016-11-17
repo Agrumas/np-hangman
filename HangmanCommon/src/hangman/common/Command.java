@@ -12,7 +12,7 @@ import java.util.UUID;
  *
  * @author Algirdas
  */
-public class Command implements Serializable {
+public class Command implements Serializable { 
 
     public ServerCommands name;
     public String data;
@@ -25,6 +25,11 @@ public class Command implements Serializable {
         this(name, "");
     }
 
+    /**
+     * Command consists of:
+     * @param name its like type
+     * @param data data which we want to send
+     */
     public Command(ServerCommands name, String data) {
         this.onSuccess = null;
         this.name = name;

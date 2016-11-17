@@ -8,7 +8,7 @@ package hangman.common;
 import java.io.Serializable;
 
 /**
- *
+ * here you should define all commands supported by server
  * @author Algirdas
  */
 public enum ServerCommands implements Serializable {
