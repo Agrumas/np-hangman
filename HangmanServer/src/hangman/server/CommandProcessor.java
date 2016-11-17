@@ -15,13 +15,14 @@ import hangman.common.Result;
 public class CommandProcessor {
 
     protected GameManager game;
+    private String data;
 
     public CommandProcessor(GameManager game) {
         this.game = game;
     }
 
     public Result process(Command cmd, Player player, SocketHandler connection) {
-        // here commands with logic meets, logic should be in GameManager
+        // here commands with logic meets
         switch (cmd.name) {
             case Login:
                 // @Todo handle duplicate names
@@ -35,6 +36,9 @@ public class CommandProcessor {
             case StartGame:
                 game.startGame(player);
                 return cmd.result("STARTED", player.getStatus());
+            case Guess:
+                game.guess(player, cmd.data);
+                return cmd.result("Guessed/faild",player.startGuessing(cmd.data));
         }
         return null;
     }

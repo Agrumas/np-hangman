@@ -42,6 +42,8 @@ public class DummyClient {
             System.out.println("Client up");            
             // sends command to server
             ous.writeObject(new Command(ServerCommands.Login, "user"));
+            ous.writeObject(new Command(ServerCommands.StartGame, "user"));
+            ous.writeObject(new Command(ServerCommands.Guess, "user"));
             ous.flush();
             Result res = null;
             try {
@@ -52,6 +54,7 @@ public class DummyClient {
                 Logger.getLogger(DummyClient.class.getName()).log(Level.SEVERE, null, ex);
             }
             
+          
             clientSocket.close();
 
             System.out.println("Result: " + res);
