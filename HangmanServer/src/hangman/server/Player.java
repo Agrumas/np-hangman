@@ -44,7 +44,7 @@ public class Player {
     public String startGuessing(String word) {
         this.word = word;
         guessesLeft = word.length();
-        guessWord = word.replace(".*", "-");
+        guessWord = word.replaceAll(".", "-");
         guesses = "";
         return guessWord;
     }
