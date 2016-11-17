@@ -28,7 +28,8 @@ public class GameManager {
     
     public String startGame(Player p){
         // some kind of Dictionary class is needed to read all words and return one randomly
-        return p.startGuessing("new guess word");
+        dic.readWordFile();
+        return p.startGuessing(dic.getRandomWord());
     }
     
     public String guess(Player p, String data){

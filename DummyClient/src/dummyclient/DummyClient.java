@@ -25,6 +25,7 @@ public class DummyClient {
 
     /**
      * To debug this can be used
+     *
      * @param args the command line arguments
      */
     public static void main(String[] args) {
@@ -34,30 +35,36 @@ public class DummyClient {
         ObjectOutputStream ous;
         ObjectInputStream ois;
         try {
-            clientSocket = new Socket("127.0.0.1", 4444);
-            in = new BufferedInputStream(clientSocket.getInputStream());
+            clientSocket = new Socket("127.0.0.1", 4444);       //open server socket
+            in = new BufferedInputStream(clientSocket.getInputStream());      //input/output stream from server  
             out = new BufferedOutputStream(clientSocket.getOutputStream());
-            
+
             ous = new ObjectOutputStream(out);
-            System.out.println("Client up");            
+            System.out.println("Client up");
             // sends command to server
             ous.writeObject(new Command(ServerCommands.Login, "user"));
             ous.writeObject(new Command(ServerCommands.StartGame, "user"));
-            ous.writeObject(new Command(ServerCommands.Guess, "user"));
+            ous.writeObject(new Command(ServerCommands.Guess, "e"));
+
             ous.flush();
             Result res = null;
+            Result resSt = null;
+            Result resGu = null;
             try {
                 ois = new ObjectInputStream(in);
                 res = (Result) ois.readObject();
+                resSt = (Result) ois.readObject();
+                resGu = (Result) ois.readObject();
                 // gets response
             } catch (ClassNotFoundException ex) {
                 Logger.getLogger(DummyClient.class.getName()).log(Level.SEVERE, null, ex);
             }
-            
-          
+
             clientSocket.close();
 
             System.out.println("Result: " + res);
+            System.out.println("Result Start: " + resSt);
+            System.out.println("Result Guess: " + resGu);
         } catch (IOException ex) {
             Logger.getLogger(DummyClient.class.getName()).log(Level.SEVERE, null, ex);
         }
